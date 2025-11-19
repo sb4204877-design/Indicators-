@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuHub - Automated Trading Bot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --dark-blue: #0a1929;
+            --accent-blue: #1e3a8a;
+            --dark-accent: #0c4a6e;
+            --light-text: #f0f9ff;
+            --gray-text: #cbd5e1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Initial Telegram Follow Page */
+        .telegram-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--dark-bg), var(--darker-bg));
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--accent-blue);
+        }
+        
+        .app-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #3b82f6, #1e40af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .app-description {
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 15px auto 25px;
+            color: var(--gray-text);
+            line-height: 1.6;
+        }
+        
+        .features {
+            background: rgba(30, 58, 138, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .features h2 {
+            margin-bottom: 12px;
+            color: #93c5fd;
+            font-size: 1.3rem;
+        }
+        
+        .features ul {
+            text-align: left;
+            padding-left: 15px;
+        }
+        
+        .features li {
+            margin: 8px 0;
+            color: var(--gray-text);
+            font-size: 0.95rem;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 12px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(30, 64, 175, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: var(--dark-accent);
+        }
+        
+        /* Input Card */
+        .input-card {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 25px;
+            width: 100%;
+            max-width: 450px;
+            margin: 15px auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .input-card h2 {
+            text-align: center;
+            margin-bottom: 18px;
+            color: #93c5fd;
+            font-size: 1.4rem;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--gray-text);
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 13px;
+            background: var(--dark-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            color: var(--light-text);
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(59, 130, 246, 0.2);
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* How to Use Page */
+        .how-to-use {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .how-to-use h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #93c5fd;
+            font-size: 1.8rem;
+        }
+        
+        .how-to-steps {
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .step {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        
+        .step h3 {
+            color: #93c5fd;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .step p {
+            color: var(--gray-text);
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .repo-info {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 18px 0;
+            text-align: center;
+        }
+        
+        .repo-info h3 {
+            color: #93c5fd;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .repo-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .repo-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Main App */
+        .main-app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            background: var(--darker-bg);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--accent-blue);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .balance-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .balance-card {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .balance-card h3 {
+            color: var(--gray-text);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .balance-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #93c5fd;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .stat-card {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #93c5fd;
+            margin: 8px 0;
+        }
+        
+        .stat-label {
+            color: var(--gray-text);
+            font-size: 0.85rem;
+        }
+        
+        /* Trading Page */
+        .trading-options {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .account-toggle {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+        }
+        
+        .toggle-btn {
+            background: var(--dark-accent);
+            border: 1px solid var(--accent-blue);
+            color: var(--gray-text);
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 0 4px;
+            font-size: 0.85rem;
+        }
+        
+        .toggle-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+        
+        .trade-amount {
+            margin: 16px 0;
+        }
+        
+        .trade-amount label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--gray-text);
+            font-size: 0.85rem;
+        }
+        
+        .strategy-card {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .strategy-card h3 {
+            margin-bottom: 12px;
+            color: #93c5fd;
+            font-size: 1.1rem;
+        }
+        
+        /* Signals Page */
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        
+        .signal-card {
+            background: var(--darker-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--accent-blue);
+        }
+        
+        .signal-header {
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .signal-green {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--success);
+        }
+        
+        .signal-red {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger);
+        }
+        
+        .signal-icon {
+            font-size: 1.3rem;
+        }
+        
+        .signal-green .signal-icon {
+            color: var(--success);
+        }
+        
+        .signal-red .signal-icon {
+            color: var(--danger);
+        }
+        
+        .signal-pair {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .signal-timer {
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .timer-circle {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        /* Trading Page */
+        .trading-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .profit-loss {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .profit-card {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--success);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .loss-card {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .trade-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-size: 1rem;
+        }
+        
+        .trade-btn.active {
+            background: var(--success);
+        }
+        
+        .trades-container {
+            margin-top: 20px;
+        }
+        
+        .trades-tabs {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            background: var(--darker-bg);
+            cursor: pointer;
+            border: 1px solid var(--accent-blue);
+            font-size: 0.9rem;
+        }
+        
+        .tab.active {
+            background: var(--dark-accent);
+        }
+        
+        .trade-list {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        
+        .trade-item {
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .trade-pair {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        
+        .trade-profit {
+            color: var(--success);
+            font-size: 0.95rem;
+        }
+        
+        .trade-loss {
+            color: var(--danger);
+            font-size: 0.95rem;
+        }
+        
+        .trade-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--gray-text);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background: var(--darker-bg);
+            padding: 10px 0;
+            border-top: 1px solid var(--accent-blue);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray-text);
+            text-decoration: none;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #3b82f6;
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--darker-bg);
+            padding: 12px;
+            text-align: center;
+            border-top: 1px solid var(--accent-blue);
+            font-size: 0.75rem;
+            color: var(--gray-text);
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0;
+        }
+        
+        .social-icon {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--dark-accent);
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .footer-links {
+            margin: 8px 0;
+        }
+        
+        .footer-link {
+            color: #93c5fd;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        
+        /* Support Chat */
+        .support-chat {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 280px;
+            height: 350px;
+            background: var(--darker-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .support-header {
+            background: var(--dark-accent);
+            padding: 12px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .support-title {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        
+        .close-chat {
+            background: none;
+            border: none;
+            color: var(--gray-text);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        
+        .message {
+            margin-bottom: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            max-width: 80%;
+            font-size: 0.9rem;
+        }
+        
+        .received {
+            background: var(--dark-accent);
+            align-self: flex-start;
+        }
+        
+        .sent {
+            background: var(--accent-blue);
+            margin-left: auto;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 8px;
+            border-top: 1px solid var(--accent-blue);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            background: var(--dark-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+        
+        .send-btn {
+            background: var(--accent-blue);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        
+        .support-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none; /* Hidden until login */
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .balance-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .trading-sections {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-title {
+                font-size: 1.8rem;
+            }
+            
+            .app-description {
+                font-size: 0.95rem;
+            }
+            
+            .support-chat {
+                width: calc(100% - 40px);
+                right: 20px;
+            }
+            
+            .support-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Telegram Follow Page -->
+    <div class="telegram-page" id="telegramPage">
+        <div class="logo">
+            <i class="fas fa-robot"></i>
+        </div>
+        <h1 class="app-title">QuHub Trading Bot</h1>
+        <p class="app-description">
+            An automated trading bot and signals system for Quotex platform. Choose from 10 developed strategies and 100+ general strategies to execute trades or receive signals without automatic trading.
+        </p>
+        
+        <div class="features">
+            <h2>How to Get Started</h2>
+            <ul>
+                <li>If you're on mobile without a laptop, install the Trimes app</li>
+                <li>Install Python and Git</li>
+                <li>Clone the repository and navigate to the folder</li>
+                <li>Run the installation command</li>
+                <li>The tool will generate an API key for this interface</li>
+            </ul>
+        </div>
+        
+        <button class="btn" id="followBtn">
+            <i class="fab fa-telegram"></i> Follow on Telegram
+        </button>
+        
+        <div class="input-card" id="keyInputCard" style="display: none;">
+            <h2>Enter Your API Key</h2>
+            <div class="form-group">
+                <label for="apiKey">API Key</label>
+                <input type="text" id="apiKey" class="form-control" placeholder="Enter your generated API key">
+            </div>
+            <button class="btn" id="submitKeyBtn">Submit Key</button>
+        </div>
+        
+        <div class="loading" id="loadingSection" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="input-card" id="loginCard" style="display: none;">
+            <h2>Login to Quotex</h2>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" class="form-control" placeholder="Your Quotex email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Your Quotex password">
+            </div>
+            <button class="btn" id="loginBtn">Login</button>
+        </div>
+        
+        <div class="input-card" id="twoFactorCard" style="display: none;">
+            <h2>Two-Factor Authentication</h2>
+            <p>Please enter the 6-digit code from your authenticator app</p>
+            <div class="form-group">
+                <label for="twoFactorCode">6-Digit Code</label>
+                <input type="text" id="twoFactorCode" class="form-control" placeholder="Enter 6-digit code">
+            </div>
+            <button class="btn" id="submit2faBtn">Submit Code</button>
+        </div>
+    </div>
+    
+    <!-- How to Use Page -->
+    <div class="how-to-use" id="howToUsePage">
+        <h1>How to Use QuHub Trading Bot</h1>
+        
+        <div class="how-to-steps">
+            <div class="step">
+                <h3>Step 1: Install Required Software</h3>
+                <p>If you're using a mobile device without a laptop, install the Trimes app. Otherwise, install Python and Git on your computer.</p>
+            </div>
+            
+            <div class="step">
+                <h3>Step 2: Clone the Repository</h3>
+                <p>Navigate to your desired folder and clone the repository using Git:</p>
+                <p><code>git clone https://github.com/tradehub/quotex-bot.git</code></p>
+            </div>
+            
+            <div class="step">
+                <h3>Step 3: Run the Installation</h3>
+                <p>Navigate to the cloned repository folder and run the installation command:</p>
+                <p><code>python install.py</code></p>
+            </div>
+            
+            <div class="step">
+                <h3>Step 4: Generate API Key</h3>
+                <p>The installation will generate an API key. Copy this key and save it securely.</p>
+            </div>
+            
+            <div class="step">
+                <h3>Step 5: Login to Quotex</h3>
+                <p>Enter your Quotex account credentials. If you have 2FA enabled, you'll need to enter the code when prompted.</p>
+            </div>
+            
+            <div class="step">
+                <h3>Step 6: Configure Trading Parameters</h3>
+                <p>On the trading page, select your account type (demo/real), choose a strategy, and set your trade amount.</p>
+            </div>
+        </div>
+        
+        <div class="repo-info">
+            <h3>Repository Information</h3>
+            <p>For more details and updates, visit our repository:</p>
+            <a href="#" class="repo-link">https://github.com/tradehub/quotex-bot</a>
+        </div>
+        
+        <button class="btn" id="startNowBtn">Start Now</button>
+    </div>
+    
+    <!-- Main Application -->
+    <div class="main-app" id="mainApp">
+        <div class="header">
+            <div class="user-info">
+                <div class="user-avatar">U</div>
+                <div class="user-name" id="userName">User</div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+        
+        <div class="content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboardPage">
+                <div class="balance-cards">
+                    <div class="balance-card">
+                        <h3>DEMO BALANCE</h3>
+                        <div class="balance-value">$10,000</div>
+                    </div>
+                    <div class="balance-card">
+                        <h3>REAL BALANCE</h3>
+                        <div class="balance-value">$2,540.75</div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">$342.50</div>
+                        <div class="stat-label">Total Profit</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$120.75</div>
+                        <div class="stat-label">Total Loss</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">Active Trades</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">87%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Daily Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">1,205</div>
+                        <div class="stat-label">Total Trades</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Strategies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">100+</div>
+                        <div class="stat-label">Signals</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trading Page -->
+            <div class="page" id="tradingPage">
+                <div class="trading-options">
+                    <h3>Trading Settings</h3>
+                    
+                    <div class="account-toggle">
+                        <div class="toggle-btn active" id="demoToggle">Demo Account</div>
+                        <div class="toggle-btn" id="realToggle">Real Account</div>
+                    </div>
+                    
+                    <div class="balance-cards">
+                        <div class="balance-card">
+                            <h3>DEMO BALANCE</h3>
+                            <div class="balance-value">$10,000</div>
+                        </div>
+                        <div class="balance-card">
+                            <h3>REAL BALANCE</h3>
+                            <div class="balance-value">$2,540.75</div>
+                        </div>
+                    </div>
+                    
+                    <div class="trade-amount">
+                        <label>Trade Amount</label>
+                        <input type="number" class="form-control" value="10">
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3>Select Strategy</h3>
+                        <select class="form-control">
+                            <option>Strategy 1: Trend Following</option>
+                            <option>Strategy 2: Breakout Trading</option>
+                            <option>Strategy 3: Mean Reversion</option>
+                            <option>Strategy 4: Scalping</option>
+                            <option>Strategy 5: News Trading</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="profit-loss">
+                    <div class="profit-card">
+                        <h3>TOTAL PROFIT</h3>
+                        <div class="balance-value">$342.50</div>
+                    </div>
+                    <div class="loss-card">
+                        <h3>TOTAL LOSS</h3>
+                        <div class="balance-value">$120.75</div>
+                    </div>
+                </div>
+                
+                <button class="btn trade-btn active">
+                    <i class="fas fa-play"></i> Start Trading
+                </button>
+                
+                <div class="trades-container">
+                    <div class="trades-tabs">
+                        <div class="tab active">Active Trades</div>
+                        <div class="tab">Completed Trades</div>
+                    </div>
+                    
+                    <div class="trade-list">
+                        <div class="trade-item">
+                            <div class="trade-header">
+                                <div class="trade-pair">BUY EURUSD_otc</div>
+                                <div class="trade-profit">+ $12.50</div>
+                            </div>
+                            <div class="trade-details">
+                                <div>Amount: $10</div>
+                                <div>Duration: 3m</div>
+                            </div>
+                        </div>
+                        
+                        <div class="trade-item">
+                            <div class="trade-header">
+                                <div class="trade-pair">SELL EURJPY_otc</div>
+                                <div class="trade-loss">- $8.25</div>
+                            </div>
+                            <div class="trade-details">
+                                <div>Amount: $10</div>
+                                <div>Duration: 5m</div>
+                            </div>
+                        </div>
+                        
+                        <div class="trade-item">
+                            <div class="trade-header">
+                                <div class="trade-pair">BUY GBPUSD_otc</div>
+                                <div class="trade-profit">+ $15.75</div>
+                            </div>
+                            <div class="trade-details">
+                                <div>Amount: $10</div>
+                                <div>Duration: 2m</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Signals Page -->
+            <div class="page" id="signalsPage">
+                <h2 style="margin-bottom: 18px;">Trading Signals</h2>
+                <div class="signals-grid">
+                    <div class="signal-card signal-green">
+                        <div class="signal-header">
+                            <div class="signal-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="signal-pair">EURUSD_otc</div>
+                        </div>
+                        <div class="signal-timer">
+                            <div class="timer-container">
+                                <span>Time left:</span>
+                                <div class="timer-circle">3m</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signal-card signal-red">
+                        <div class="signal-header">
+                            <div class="signal-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="signal-pair">GBPJPY_otc</div>
+                        </div>
+                        <div class="signal-timer">
+                            <div class="timer-container">
+                                <span>Time left:</span>
+                                <div class="timer-circle">1h</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signal-card signal-green">
+                        <div class="signal-header">
+                            <div class="signal-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="signal-pair">USDJPY_otc</div>
+                        </div>
+                        <div class="signal-timer">
+                            <div class="timer-container">
+                                <span>Time left:</span>
+                                <div class="timer-circle">45m</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signal-card signal-red">
+                        <div class="signal-header">
+                            <div class="signal-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="signal-pair">EURGBP_otc</div>
+                        </div>
+                        <div class="signal-timer">
+                            <div class="timer-container">
+                                <span>Time left:</span>
+                                <div class="timer-circle">2h</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signal-card signal-green">
+                        <div class="signal-header">
+                            <div class="signal-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="signal-pair">AUDUSD_otc</div>
+                        </div>
+                        <div class="signal-timer">
+                            <div class="timer-container">
+                                <span>Time left:</span>
+                                <div class="timer-circle">15m</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signal-card signal-red">
+                        <div class="signal-header">
+                            <div class="signal-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="signal-pair">USDCAD_otc</div>
+                        </div>
+                        <div class="signal-timer">
+                            <div class="timer-container">
+                                <span>Time left:</span>
+                                <div class="timer-circle">30m</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-page="dashboardPage">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-page="signalsPage">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Signals</span>
+            </div>
+            <div class="nav-item" data-page="tradingPage">
+                <i class="fas fa-exchange-alt nav-icon"></i>
+                <span>Trading</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Support Chat -->
+    <div class="support-chat" id="supportChat">
+        <div class="support-header">
+            <div class="support-title">Support Chat</div>
+            <button class="close-chat" id="closeChat">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message received">
+                Hello! How can we help you today?
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type your message...">
+            <button class="send-btn" id="sendMessageBtn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Support Button -->
+    <button class="support-btn" id="supportBtn">
+        <i class="fas fa-headset"></i>
+    </button>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <div class="social-icons">
+            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+        </div>
+        
+        <div class="footer-links">
+            <a href="#" class="footer-link">Terms of Use</a>
+            <a href="#" class="footer-link">Privacy Policy</a>
+        </div>
+        
+        <p>&copy; 2025 TradeHub. All rights reserved. | Developed by Quotex Bot Team</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const telegramPage = document.getElementById('telegramPage');
+            const howToUsePage = document.getElementById('howToUsePage');
+            const mainApp = document.getElementById('mainApp');
+            const followBtn = document.getElementById('followBtn');
+            const keyInputCard = document.getElementById('keyInputCard');
+            const submitKeyBtn = document.getElementById('submitKeyBtn');
+            const loadingSection = document.getElementById('loadingSection');
+            const loginCard = document.getElementById('loginCard');
+            const loginBtn = document.getElementById('loginBtn');
+            const twoFactorCard = document.getElementById('twoFactorCard');
+            const submit2faBtn = document.getElementById('submit2faBtn');
+            const userName = document.getElementById('userName');
+            const startNowBtn = document.getElementById('startNowBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            
+            // Account toggles
+            const demoToggle = document.getElementById('demoToggle');
+            const realToggle = document.getElementById('realToggle');
+            
+            // Support chat
+            const supportBtn = document.getElementById('supportBtn');
+            const supportChat = document.getElementById('supportChat');
+            const closeChat = document.getElementById('closeChat');
+            const sendMessageBtn = document.getElementById('sendMessageBtn');
+            const messageInput = document.getElementById('messageInput');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Follow button click - simulate Telegram follow
+            followBtn.addEventListener('click', function() {
+                // In a real app, this would redirect to Telegram
+                // For demo, we'll just show the API key input
+                keyInputCard.style.display = 'block';
+                followBtn.style.display = 'none';
+            });
+            
+            // Submit API key
+            submitKeyBtn.addEventListener('click', function() {
+                const apiKey = document.getElementById('apiKey').value;
+                if(apiKey) {
+                    loadingSection.style.display = 'flex';
+                    keyInputCard.style.display = 'none';
+                    
+                    // Simulate API key validation
+                    setTimeout(function() {
+                        loadingSection.style.display = 'none';
+                        loginCard.style.display = 'block';
+                    }, 2000);
+                }
+            });
+            
+            // Login button
+            loginBtn.addEventListener('click', function() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if(email && password) {
+                    loadingSection.style.display = 'flex';
+                    loginCard.style.display = 'none';
+                    
+                    // Simulate login process
+                    setTimeout(function() {
+                        loadingSection.style.display = 'none';
+                        
+                        // Simulate 2FA requirement (50% chance)
+                        if(Math.random() > 0.5) {
+                            twoFactorCard.style.display = 'block';
+                        } else {
+                            // Success - show how to use page
+                            showHowToUse();
+                        }
+                    }, 2000);
+                }
+            });
+            
+            // Submit 2FA code
+            submit2faBtn.addEventListener('click', function() {
+                const code = document.getElementById('twoFactorCode').value;
+                if(code && code.length === 6) {
+                    loadingSection.style.display = 'flex';
+                    twoFactorCard.style.display = 'none';
+                    
+                    // Simulate 2FA validation
+                    setTimeout(function() {
+                        loadingSection.style.display = 'none';
+                        showHowToUse();
+                    }, 2000);
+                }
+            });
+            
+            // Show how to use page
+            function showHowToUse() {
+                telegramPage.style.display = 'none';
+                howToUsePage.style.display = 'flex';
+            }
+            
+            // Start now button
+            startNowBtn.addEventListener('click', function() {
+                howToUsePage.style.display = 'none';
+                mainApp.style.display = 'flex';
+                userName.textContent = '@trader123'; // Simulated username
+                
+                // Show support button after login
+                supportBtn.style.display = 'flex';
+            });
+            
+            // Logout button
+            logoutBtn.addEventListener('click', function() {
+                mainApp.style.display = 'none';
+                supportBtn.style.display = 'none';
+                telegramPage.style.display = 'flex';
+                
+                // Reset all forms
+                keyInputCard.style.display = 'none';
+                loginCard.style.display = 'none';
+                twoFactorCard.style.display = 'none';
+                followBtn.style.display = 'block';
+            });
+            
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    
+                    if(pageId) {
+                        // Update active nav item
+                        navItems.forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Show selected page
+                        pages.forEach(page => {
+                            page.classList.remove('active');
+                            if(page.id === pageId) {
+                                page.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Account toggle
+            demoToggle.addEventListener('click', function() {
+                demoToggle.classList.add('active');
+                realToggle.classList.remove('active');
+            });
+            
+            realToggle.addEventListener('click', function() {
+                realToggle.classList.add('active');
+                demoToggle.classList.remove('active');
+            });
+            
+            // Support chat
+            supportBtn.addEventListener('click', function() {
+                supportChat.style.display = 'flex';
+            });
+            
+            closeChat.addEventListener('click', function() {
+                supportChat.style.display = 'none';
+            });
+            
+            sendMessageBtn.addEventListener('click', function() {
+                sendMessage();
+            });
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if(message) {
+                    const messageElement = document.createElement('div');
+                    messageElement.classList.add('message', 'sent');
+                    messageElement.textContent = message;
+                    chatMessages.appendChild(messageElement);
+                    
+                    messageInput.value = '';
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // Simulate response after a delay
+                    setTimeout(() => {
+                        const responseElement = document.createElement('div');
+                        responseElement.classList.add('message', 'received');
+                        responseElement.textContent = "Thank you for your message. Our support team will get back to you soon.";
+                        chatMessages.appendChild(responseElement);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 1000);
+                }
+            }
+            
+            // Simulate timer countdown for signals
+            function updateTimers() {
+                const timers = document.querySelectorAll('.timer-circle');
+                timers.forEach(timer => {
+                    let timeText = timer.textContent;
+                    let timeValue = timeText.replace(/[^\d]/g, '');
+                    let unit = timeText.replace(/[\d]/g, '');
+                    
+                    if(timeValue > 0) {
+                        timeValue--;
+                        timer.textContent = timeValue + unit;
+                    } else {
+                        // Timer finished - change color to indicate expired
+                        timer.closest('.signal-card').style.borderColor = '#cbd5e1';
+                    }
+                });
+            }
+            
+            // Update timers every second
+            setInterval(updateTimers, 1000);
+        });
+    </script>
+</body>
+</html>
